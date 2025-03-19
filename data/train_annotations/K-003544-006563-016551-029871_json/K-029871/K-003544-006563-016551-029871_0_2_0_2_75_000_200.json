@@ -1,0 +1,81 @@
+{
+    "images": [
+        {
+            "file_name": "K-003544-006563-016551-029871_0_2_0_2_75_000_200.png",
+            "width": 976,
+            "height": 1280,
+            "imgfile": "K-003544-006563-016551-029871_0_2_0_2_75_000_200.png",
+            "drug_N": "K-029871",
+            "drug_S": "정상알약",
+            "back_color": "연회색 배경",
+            "drug_dir": "앞면",
+            "light_color": "주백색",
+            "camera_la": 75,
+            "camera_lo": 0,
+            "size": 200,
+            "dl_idx": "29870",
+            "dl_mapping_code": "K-029871",
+            "dl_name": "렉사프로정 15mg",
+            "dl_name_en": "Lexapro Tab. 15mg",
+            "img_key": "http://connectdi.com/design/img/drug/154601164159700155.jpg",
+            "dl_material": "에스시탈로프람옥살산염",
+            "dl_material_en": "Escitalopram Oxalate",
+            "dl_custom_shape": "정제, 저작정",
+            "dl_company": "한국룬드벡(주)",
+            "dl_company_en": "Lundbeck Korea",
+            "di_company_mf": "",
+            "di_company_mf_en": "",
+            "item_seq": 201206335,
+            "di_item_permit_date": "20120731",
+            "di_class_no": "[01170]정신신경용제",
+            "di_etc_otc_code": "전문의약품",
+            "di_edi_code": "668000070",
+            "chart": "한쪽 면에 분할선과 E, M이 새겨진 흰색의 타원형 필름코팅정제",
+            "drug_shape": "타원형",
+            "thick": 3,
+            "leng_long": 9,
+            "leng_short": 6,
+            "print_front": "E분할선M",
+            "print_back": "",
+            "color_class1": "하양",
+            "color_class2": "",
+            "line_front": "-",
+            "line_back": "",
+            "img_regist_ts": "20120824",
+            "form_code_name": "필름코팅정",
+            "mark_code_front_anal": "",
+            "mark_code_back_anal": "",
+            "mark_code_front_img": "",
+            "mark_code_back_img": "",
+            "mark_code_front": "",
+            "mark_code_back": "",
+            "change_date": "20201221",
+            "id": 810
+        }
+    ],
+    "type": "instances",
+    "annotations": [
+        {
+            "area": 42558,
+            "iscrowd": 0,
+            "bbox": [
+                605,
+                790,
+                173,
+                246
+            ],
+            "category_id": 29870,
+            "ignore": 0,
+            "segmentation": [],
+            "id": 3072,
+            "image_id": 810
+        }
+    ],
+    "categories": [
+        {
+            "supercategory": "pill",
+            "id": 29870,
+            "name": "렉사프로정 15mg"
+        }
+    ]
+}

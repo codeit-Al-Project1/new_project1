@@ -1,0 +1,6 @@
+data/test_images/*.png
+data/train_images/*.png
+data/train_annotation/**/*.json
+data/merged_annotations/*.json
+data/mapped_annotations/*.json
+notebooks/nb_models/*.pth

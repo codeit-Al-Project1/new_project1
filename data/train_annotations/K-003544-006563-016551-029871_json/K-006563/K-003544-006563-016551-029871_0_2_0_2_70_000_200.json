@@ -1,0 +1,81 @@
+{
+    "images": [
+        {
+            "file_name": "K-003544-006563-016551-029871_0_2_0_2_70_000_200.png",
+            "width": 976,
+            "height": 1280,
+            "imgfile": "K-003544-006563-016551-029871_0_2_0_2_70_000_200.png",
+            "drug_N": "K-006563",
+            "drug_S": "정상알약",
+            "back_color": "연회색 배경",
+            "drug_dir": "앞면",
+            "light_color": "주백색",
+            "camera_la": 70,
+            "camera_lo": 0,
+            "size": 200,
+            "dl_idx": "6562",
+            "dl_mapping_code": "K-006563",
+            "dl_name": "조인스정 200mg",
+            "dl_name_en": "Joins Tab.",
+            "img_key": "http://connectdi.com/design/img/drug/147427975564100089.jpg",
+            "dl_material": "위령선·괄루근·하고초30%에탄올건조엑스",
+            "dl_material_en": "Clematidis Radix|Trichosanthes Root|Prunella Spike 30%",
+            "dl_custom_shape": "정제, 저작정",
+            "dl_company": "에스케이케미칼(주)",
+            "dl_company_en": "Sk Chemicals",
+            "di_company_mf": "",
+            "di_company_mf_en": "",
+            "item_seq": 199702182,
+            "di_item_permit_date": "19970923",
+            "di_class_no": "[01140]해열.진통.소염제",
+            "di_etc_otc_code": "전문의약품",
+            "di_edi_code": "644701930,A18901651",
+            "chart": "타원형의 황갈색 필름코팅정제",
+            "drug_shape": "타원형",
+            "thick": 6,
+            "leng_long": 15,
+            "leng_short": 8,
+            "print_front": "SK",
+            "print_back": "J200",
+            "color_class1": "노랑",
+            "color_class2": "",
+            "line_front": "",
+            "line_back": "",
+            "img_regist_ts": "20050627",
+            "form_code_name": "필름코팅정",
+            "mark_code_front_anal": "",
+            "mark_code_back_anal": "",
+            "mark_code_front_img": "",
+            "mark_code_back_img": "",
+            "mark_code_front": "",
+            "mark_code_back": "",
+            "change_date": "20110321",
+            "id": 809
+        }
+    ],
+    "type": "instances",
+    "annotations": [
+        {
+            "area": 72504,
+            "iscrowd": 0,
+            "bbox": [
+                586,
+                237,
+                212,
+                342
+            ],
+            "category_id": 6562,
+            "ignore": 0,
+            "segmentation": [],
+            "id": 3076,
+            "image_id": 809
+        }
+    ],
+    "categories": [
+        {
+            "supercategory": "pill",
+            "id": 6562,
+            "name": "조인스정 200mg"
+        }
+    ]
+}

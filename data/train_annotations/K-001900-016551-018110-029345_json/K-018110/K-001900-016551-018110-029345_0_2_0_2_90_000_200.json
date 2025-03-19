@@ -1,0 +1,81 @@
+{
+    "images": [
+        {
+            "file_name": "K-001900-016551-018110-029345_0_2_0_2_90_000_200.png",
+            "width": 976,
+            "height": 1280,
+            "imgfile": "K-001900-016551-018110-029345_0_2_0_2_90_000_200.png",
+            "drug_N": "K-018110",
+            "drug_S": "정상알약",
+            "back_color": "연회색 배경",
+            "drug_dir": "앞면",
+            "light_color": "주백색",
+            "camera_la": 90,
+            "camera_lo": 0,
+            "size": 200,
+            "dl_idx": "18109",
+            "dl_mapping_code": "K-018110",
+            "dl_name": "란스톤엘에프디티정 30mg",
+            "dl_name_en": "Lanston LFDT Tab. 30mg",
+            "img_key": "http://connectdi.com/design/img/drug/1MwjLoFp4UL.jpg",
+            "dl_material": "란소프라졸",
+            "dl_material_en": "Lansoprazole",
+            "dl_custom_shape": "확산정, 속붕정, 구강붕해정",
+            "dl_company": "한국다케다제약(주)",
+            "dl_company_en": "Takeda Pharmaceutical Korea",
+            "di_company_mf": "",
+            "di_company_mf_en": "",
+            "item_seq": 200510974,
+            "di_item_permit_date": "20050419",
+            "di_class_no": "[02320]소화성궤양용제",
+            "di_etc_otc_code": "전문의약품",
+            "di_edi_code": "621500020,645400170,696300130,E00210421",
+            "chart": "이 약은 적색～암갈색 반점이 있는 백색～황백색의 정제이다",
+            "drug_shape": "원형",
+            "thick": 4.9,
+            "leng_long": 11.5,
+            "leng_short": 11.5,
+            "print_front": "마크213",
+            "print_back": "30",
+            "color_class1": "분홍",
+            "color_class2": "",
+            "line_front": "",
+            "line_back": "",
+            "img_regist_ts": "20100614",
+            "form_code_name": "구강붕해정",
+            "mark_code_front_anal": "△,삼각형,원",
+            "mark_code_back_anal": "",
+            "mark_code_front_img": "http://connectdi.com/design/img/drug/147938661567700073.jpg",
+            "mark_code_back_img": "",
+            "mark_code_front": "",
+            "mark_code_back": "",
+            "change_date": "20200130",
+            "id": 684
+        }
+    ],
+    "type": "instances",
+    "annotations": [
+        {
+            "area": 89352,
+            "iscrowd": 0,
+            "bbox": [
+                78,
+                762,
+                306,
+                292
+            ],
+            "category_id": 18109,
+            "ignore": 0,
+            "segmentation": [],
+            "id": 2587,
+            "image_id": 684
+        }
+    ],
+    "categories": [
+        {
+            "supercategory": "pill",
+            "id": 18109,
+            "name": "란스톤엘에프디티정 30mg"
+        }
+    ]
+}

@@ -1,0 +1,81 @@
+{
+    "images": [
+        {
+            "file_name": "K-002483-003743-012081-023223_0_2_0_2_75_000_200.png",
+            "width": 976,
+            "height": 1280,
+            "imgfile": "K-002483-003743-012081-023223_0_2_0_2_75_000_200.png",
+            "drug_N": "K-023223",
+            "drug_S": "정상알약",
+            "back_color": "연회색 배경",
+            "drug_dir": "앞면",
+            "light_color": "주백색",
+            "camera_la": 75,
+            "camera_lo": 0,
+            "size": 200,
+            "dl_idx": "23222",
+            "dl_mapping_code": "K-023223",
+            "dl_name": "비타비백정 100mg/병",
+            "dl_name_en": "Vita B 100 Tab.",
+            "img_key": "http://connectdi.com/design/img/drug/152035096572400005.jpg",
+            "dl_material": "니코틴산아미드|피리독신염산염97%과립|리보플라빈|티아민질산염|판토텐산칼슘|폴산|d-비오틴1%|시아노코발라민100배산|우르소데옥시콜산",
+            "dl_material_en": "Folic Acid| Biotin 1%| Calcium Pantothenate| Cyanocobalamin(1000倍散)| Nicotinamide| Pyridoxine Hydrochloride 97% Gr.| Riboflavin| Thiamine Nitrate| Ursodeoxycholic Acid",
+            "dl_custom_shape": "정제, 저작정",
+            "dl_company": "(주)유한양행",
+            "dl_company_en": "Yuhan",
+            "di_company_mf": "",
+            "di_company_mf_en": "",
+            "item_seq": 200802213,
+            "di_item_permit_date": "20080226",
+            "di_class_no": "[03160]혼합비타민제(비타민AD 혼합제제를 제외)",
+            "di_etc_otc_code": "일반의약품",
+            "di_edi_code": "642103030",
+            "chart": "적색의 타원형 제피정",
+            "drug_shape": "타원형",
+            "thick": 6.6,
+            "leng_long": 19.38,
+            "leng_short": 9.31,
+            "print_front": "YH",
+            "print_back": "V100",
+            "color_class1": "빨강",
+            "color_class2": "",
+            "line_front": "",
+            "line_back": "",
+            "img_regist_ts": "20080725",
+            "form_code_name": "필름코팅정",
+            "mark_code_front_anal": "",
+            "mark_code_back_anal": "",
+            "mark_code_front_img": "",
+            "mark_code_back_img": "",
+            "mark_code_front": "",
+            "mark_code_back": "",
+            "change_date": "20190826",
+            "id": 48
+        }
+    ],
+    "type": "instances",
+    "annotations": [
+        {
+            "area": 155620,
+            "iscrowd": 0,
+            "bbox": [
+                105,
+                144,
+                310,
+                502
+            ],
+            "category_id": 23222,
+            "ignore": 0,
+            "segmentation": [],
+            "id": 177,
+            "image_id": 48
+        }
+    ],
+    "categories": [
+        {
+            "supercategory": "pill",
+            "id": 23222,
+            "name": "비타비백정 100mg/병"
+        }
+    ]
+}

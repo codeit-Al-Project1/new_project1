@@ -1,0 +1,81 @@
+{
+    "images": [
+        {
+            "file_name": "K-002483-003743-013395-022627_0_2_0_2_75_000_200.png",
+            "width": 976,
+            "height": 1280,
+            "imgfile": "K-002483-003743-013395-022627_0_2_0_2_75_000_200.png",
+            "drug_N": "K-022627",
+            "drug_S": "정상알약",
+            "back_color": "연회색 배경",
+            "drug_dir": "앞면",
+            "light_color": "주백색",
+            "camera_la": 75,
+            "camera_lo": 0,
+            "size": 200,
+            "dl_idx": "22626",
+            "dl_mapping_code": "K-022627",
+            "dl_name": "메가파워정 90mg/병",
+            "dl_name_en": "Mega Power Tab.",
+            "img_key": "http://connectdi.com/design/img/drug/147427814578200038.jpg",
+            "dl_material": "",
+            "dl_material_en": "Selenium in Dried Yeast| Ascorbic Acid Gr. 97%| Calcium Pantothenate| Cyanocobalamin 1%| Dibasic Calcium Phosphate| Ergocalciferol Gr.| Ferrous Fumarate| Magnesium Oxide| Manganese Sulfate| Molybden in Dried Yeast| Nicotinamide| Potassium Chloride| Pyridoxine Hydrochloride 97% Gr.| Retinol Acetate Gr.| Riboflavin| Thiamine Nitrate(3倍散)| Tocopherol Acetate 50%| Zinc Sulfate",
+            "dl_custom_shape": "정제, 저작정",
+            "dl_company": "(주)유한양행",
+            "dl_company_en": "Yuhan",
+            "di_company_mf": "",
+            "di_company_mf_en": "",
+            "item_seq": 200712481,
+            "di_item_permit_date": "20071115",
+            "di_class_no": "[03160]혼합비타민제(비타민AD 혼합제제를 제외)",
+            "di_etc_otc_code": "일반의약품",
+            "di_edi_code": "642100500",
+            "chart": "적색의 타원형 제피정",
+            "drug_shape": "타원형",
+            "thick": 6.8,
+            "leng_long": 18.3,
+            "leng_short": 9.5,
+            "print_front": "YH",
+            "print_back": "MG",
+            "color_class1": "빨강",
+            "color_class2": "",
+            "line_front": "",
+            "line_back": "",
+            "img_regist_ts": "20080306",
+            "form_code_name": "필름코팅정",
+            "mark_code_front_anal": "",
+            "mark_code_back_anal": "",
+            "mark_code_front_img": "",
+            "mark_code_back_img": "",
+            "mark_code_front": "",
+            "mark_code_back": "",
+            "change_date": "20210326",
+            "id": 576
+        }
+    ],
+    "type": "instances",
+    "annotations": [
+        {
+            "area": 150350,
+            "iscrowd": 0,
+            "bbox": [
+                96,
+                208,
+                310,
+                485
+            ],
+            "category_id": 22626,
+            "ignore": 0,
+            "segmentation": [],
+            "id": 2178,
+            "image_id": 576
+        }
+    ],
+    "categories": [
+        {
+            "supercategory": "pill",
+            "id": 22626,
+            "name": "메가파워정 90mg/병"
+        }
+    ]
+}

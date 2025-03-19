@@ -1,0 +1,81 @@
+{
+    "images": [
+        {
+            "file_name": "K-003483-020238-027653-031885_0_2_0_2_70_000_200.png",
+            "width": 976,
+            "height": 1280,
+            "imgfile": "K-003483-020238-027653-031885_0_2_0_2_70_000_200.png",
+            "drug_N": "K-027653",
+            "drug_S": "정상알약",
+            "back_color": "연회색 배경",
+            "drug_dir": "앞면",
+            "light_color": "주백색",
+            "camera_la": 70,
+            "camera_lo": 0,
+            "size": 200,
+            "dl_idx": "27652",
+            "dl_mapping_code": "K-027653",
+            "dl_name": "세비카정 10/40mg",
+            "dl_name_en": "Sevikar Tab. 10/40mg",
+            "img_key": "http://connectdi.com/design/img/drug/147426502377200196.jpg",
+            "dl_material": "올메사르탄메독소밀|암로디핀베실산염",
+            "dl_material_en": "Amlodipine Besylate| Olmesartan Medoxomil",
+            "dl_custom_shape": "정제, 저작정",
+            "dl_company": "한국다이이찌산쿄(주)",
+            "dl_company_en": "Daiichi Sankyo Korea",
+            "di_company_mf": "",
+            "di_company_mf_en": "",
+            "item_seq": 201004570,
+            "di_item_permit_date": "20100719",
+            "di_class_no": "[02140]혈압강하제",
+            "di_etc_otc_code": "전문의약품",
+            "di_edi_code": "680900060",
+            "chart": "적갈색의 원형 필름코팅정제",
+            "drug_shape": "원형",
+            "thick": 4.1,
+            "leng_long": 8.2,
+            "leng_short": 8.2,
+            "print_front": "C77",
+            "print_back": "",
+            "color_class1": "갈색",
+            "color_class2": "",
+            "line_front": "",
+            "line_back": "",
+            "img_regist_ts": "20100810",
+            "form_code_name": "필름코팅정",
+            "mark_code_front_anal": "",
+            "mark_code_back_anal": "",
+            "mark_code_front_img": "",
+            "mark_code_back_img": "",
+            "mark_code_front": "",
+            "mark_code_back": "",
+            "change_date": "20210331",
+            "id": 387
+        }
+    ],
+    "type": "instances",
+    "annotations": [
+        {
+            "area": 43600,
+            "iscrowd": 0,
+            "bbox": [
+                671,
+                255,
+                218,
+                200
+            ],
+            "category_id": 27652,
+            "ignore": 0,
+            "segmentation": [],
+            "id": 1455,
+            "image_id": 387
+        }
+    ],
+    "categories": [
+        {
+            "supercategory": "pill",
+            "id": 27652,
+            "name": "세비카정 10/40mg"
+        }
+    ]
+}
