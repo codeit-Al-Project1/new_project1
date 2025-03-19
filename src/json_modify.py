@@ -110,7 +110,7 @@ def json_modify(output_dir, json_folder, img=img, annot=annot):
 
 
 # 실행 
-# output_dir = "data/train_annots_modify"
-# json_folder = "/content/Project1/data/train_annotations"
+output_dir = "data/train_annots_modify"
+json_folder = "data/train_annotations"
 
-# json_modify(output_dir, json_folder)
+json_modify(output_dir, json_folder)
