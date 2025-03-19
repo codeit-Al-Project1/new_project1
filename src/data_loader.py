@@ -1,8 +1,46 @@
-#################
-# 실행방법?
-# python src/data_loader.py --mode train --batch_size 4 --debug
-# 
-# 카테고리 매핑, 리사이즈(나중에), 데이터셋 리턴값
+########################################
+# 실행 방법 및 인자 설명 (터미널 기준)
+#
+# 사용법:
+#   python src/data_loader.py --mode <모드> --batch_size <배치 크기> [--debug]
+#
+# 파싱 인자 설명:
+# --mode (필수)  
+#   - 선택 가능 값: 'train', 'val', 'test'  
+#   - train  : 학습용 데이터셋 로드 및 디버깅 실행  
+#   - val    : 검증용 데이터셋 로드 및 디버깅 실행  
+#   - test   : 테스트용 데이터셋 로드 (어노테이션 없이 이미지와 파일명 반환)  
+#
+# --batch_size (선택, default=4)  
+#   - DataLoader에서 사용하는 배치 크기  
+#   - ex) --batch_size 8 → 8개 샘플 단위로 배치 로딩  
+#
+# --debug (옵션)  
+#   - 해당 플래그 추가 시 디버깅 모드 활성화  
+#   - 데이터셋 및 배치 관련 상세 정보를 출력  
+#   - 출력 예: 카테고리 매핑 정보, 총 데이터 수, Split 비율,  
+#              각 배치별 이미지 크기, 박스 정보, 라벨 등장 분포 등  
+#
+# 실행 예시 (터미널):
+# 1) 학습 데이터셋 로더 테스트
+#   python src/data_loader.py --mode train --batch_size 4 --debug
+#
+# 2) 검증 데이터셋 로더 테스트
+#   python src/data_loader.py --mode val --batch_size 8 --debug
+#
+# 3) 테스트 데이터셋 로더 테스트
+#   python src/data_loader.py --mode test --batch_size 16 --debug
+#
+# 프로젝트 폴더 예시:
+# data/
+# ├─ train_images/           (훈련 이미지)
+# ├─ train_annots_modify/    (훈련 어노테이션 JSON)
+# └─ test_images/            (테스트 이미지)
+#
+# ⚠ 디버깅 모드를 활성화하면, 매핑 테이블, 데이터 수,  
+#    각 배치별 샘플 크기, 바운딩 박스 통계, 라벨별 출현 횟수,  
+#    pill_names 목록 등을 모두 확인 가능합니다!
+########################################
 
 import os
 import json
@@ -15,7 +53,7 @@ import argparse
 import sys
 
 ####################################################################################################
-# 데이터 증강을 위한 transform 정의
+# 1. 데이터 증강을 위한 transform 정의
 def get_transforms(mode='train'):
     """
     데이터 증강 및 전처리 함수를 반환합니다.
@@ -46,8 +84,38 @@ def get_transforms(mode='train'):
         raise ValueError(f"Invalid mode: {mode}. Choose either 'train', 'val', or 'test'.")
 
 ####################################################################################################
-# json파일에서 카테고리 매핑을 만드는 함수
+# 2. json파일에서 카테고리 매핑을 만드는 함수
 def get_category_mapping(ann_dir):
+    """
+    어노테이션 디렉토리 내 JSON 파일들을 탐색하여  
+    카테고리 ID와 이름 간의 매핑을 생성하고,  
+    이름 기준 정렬 후 인덱스를 재부여하는 함수입니다.
+
+    Args:
+        ann_dir (str): 어노테이션 JSON 파일들이 저장된 디렉토리 경로
+
+    Returns:
+        name_to_idx (dict):  
+            - Key: 카테고리 이름 (str)  
+            - Value: 인덱스 (int)  
+            - 0은 'Background'로 설정하며, 마지막 인덱스는 'No Class'로 지정합니다.
+
+        idx_to_name (dict):  
+            - Key: 인덱스 (int)  
+            - Value: 카테고리 이름 (str)  
+            - 역방향으로 인덱스를 통해 이름을 찾을 수 있는 매핑을 제공합니다.
+
+    Note:
+        - 중복된 카테고리 이름은 제거 후 정렬합니다.
+        - 이름 기준으로 정렬하여 일관된 인덱스를 제공합니다.
+        - 추후 모델 학습 시 카테고리 ID → 카테고리 이름 매핑 및 시각화에 활용됩니다.
+    """
+    # 디버깅 메시지 출력
+    if not isinstance(ann_dir, str):
+        raise TypeError(f"ann_dir는 문자열(str)이어야 합니다. 현재 타입: {type(ann_dir)}")
+    if not os.path.exists(ann_dir):
+        raise FileNotFoundError(f"ann_dir 경로가 존재하지 않습니다: {ann_dir}")
+    
     id_to_name = {}
     #  id -> name 매핑 수집
     for file in os.listdir(ann_dir):
@@ -70,31 +138,49 @@ def get_category_mapping(ann_dir):
     return name_to_idx, idx_to_name
 
 ####################################################################################################
-# 데이터셋
+# 3. 데이터셋
 class PillDataset(Dataset):
     def __init__(self, image_dir, ann_dir=None, mode='train', category_mapping=None, transform=None, debug=False):
         """
-        알약 이미지 데이터셋 클래스
+        PillDataset 클래스
 
-        Args:
-            image_dir (str): 이미지 파일들이 저장된 경로
-            ann_dir (str, optional): 어노테이션 파일이 저장된 경로 (train/val 모드에서 필요)
-            mode (str): 'train', 'val', 'test' 중 하나
-            category_mapping ()
-            transform (callable, optional): 이미지 변환 함수
-            debug (bool): 디버깅 모드 (이미지와 어노테이션 중 하나가 없는 경우 출력)
-        
-        Raises:
-            AssertionError: Train/Val 모드에서 `ann_dir`이 필요함
+        알약 이미지와 어노테이션(json) 파일을 로드하여  
+        모델 학습 및 검증을 위한 데이터셋 형태로 제공하는 PyTorch Dataset 클래스입니다.  
+
+        Attributes:
+            image_dir (str): 이미지 파일이 저장된 디렉토리 경로  
+            ann_dir (str, optional): 어노테이션 JSON 파일들이 저장된 디렉토리 경로 (train/val 모드에서 필요)  
+            mode (str): 'train', 'val', 'test' 중 하나로 데이터셋의 동작 모드를 결정  
+            category_mapping (dict): 카테고리 이름과 인덱스 매핑 정보  
+            transform (callable, optional): 이미지 및 bounding box에 적용할 변환 함수  
+            debug (bool): 이미지/어노테이션 불일치 시 경고 출력 여부  
+
+        Notes:
+            - train/val 모드에서는 이미지-어노테이션 쌍을 필터링 후 로드합니다.  
+            - test 모드에서는 어노테이션 없이 이미지 파일 경로만 반환합니다.  
         """
+        # 디버깅 메시지 출력 
+        if not isinstance(image_dir, str):
+            raise TypeError(f"image_dir는 문자열(str)이어야 합니다. 현재 타입: {type(image_dir)}")
+        if ann_dir is not None and not isinstance(ann_dir, str):
+            raise TypeError(f"ann_dir는 문자열(str)이거나 None이어야 합니다. 현재 타입: {type(ann_dir)}")
+        if mode not in ['train', 'val', 'test']:
+            raise ValueError(f"mode는 'train', 'val', 'test' 중 하나여야 합니다. 현재 입력: {mode}")
+        if category_mapping is not None and not isinstance(category_mapping, dict):
+            raise TypeError(f"category_mapping은 dict 타입이어야 합니다. 현재 타입: {type(category_mapping)}")
+        if transform is not None and not callable(transform):
+            raise TypeError(f"transform은 호출 가능 객체이어야 합니다. 현재 타입: {type(transform)}")
+        if not isinstance(debug, bool):
+            raise TypeError(f"debug는 bool 타입이어야 합니다. 현재 타입: {type(debug)}")
+        
+        # 인자 받기기
         self.img_dir = image_dir
         self.ann_dir = ann_dir
         self.mode = mode
         self.transform = transform
+        self.category_mapping = category_mapping    # 카테고리 이름 <-> 아이디 매핑
 
-        # 카테고리 이름 <-> 아이디 매핑
-        self.category_mapping = category_mapping
-
+        # 이미지
         self.images = sorted(os.listdir(image_dir))
 
         # train, val/ test 분기
@@ -115,7 +201,7 @@ class PillDataset(Dataset):
 
             # 디버깅(차이점 출력)
             if debug:
-                print(f"총 {len(common_name)}개의 이미지-어노테이션 파일 처리")
+                print(f"\n[DEBUG] 총 {len(common_name)}개의 이미지-어노테이션 파일 처리")
                 if missing_img:
                     print(f"[WARNING] 어노테이션은 있지만 이미지가 없는 파일 목록(총 {len(missing_img)}개개):")
                     for name in sorted(missing_img):
@@ -134,12 +220,34 @@ class PillDataset(Dataset):
 
     def __getitem__(self, idx):
         """
-        주어진 인덱스에 해당하는 이미지 및 어노테이션 데이터를 가져옵니다.
+        __getitem__ 함수
+
+        인덱스를 입력 받아 해당 인덱스의 이미지 및 어노테이션 데이터를 반환합니다.
+
+        Args:
+            idx (int): 호출할 데이터의 인덱스  
 
         Returns:
-            train/val 모드: (img(TVImage), bboxes_tensor(BoundingBoxes), labels_tensor(torch.Tensor))
-            test 모드: (img(TVImage), img_file(str))
+            - train/val 모드:  
+                img (TVImage): 이미지 텐서  
+                targets (dict):  
+                    - boxes (BoundingBoxes): 바운딩 박스 좌표  
+                    - labels (torch.Tensor): 클래스 인덱스 라벨  
+                    - image_id (torch.Tensor): 이미지 고유 식별자  
+                    - area (torch.Tensor): 객체 영역  
+                    - is_crowd (torch.Tensor): crowd 플래그 (0으로 고정)  
+                    - orig_size (torch.Tensor): 원본 이미지 크기  
+                    - pill_names (list): 바운딩 박스에 해당하는 알약 이름  
+
+            - test 모드:  
+                img (TVImage): 이미지 텐서  
+                img_file (str): 이미지 파일명 (추론 시 사용)  
         """
+        # 디버깅 메시지 출력
+        if not isinstance(idx, int):
+            raise TypeError(f"인덱스는 int 타입이어야 합니다. 현재 타입: {type(idx)}")
+        if idx >= len(self.images):
+            raise IndexError(f"인덱스 {idx}가 데이터셋 크기 {len(self.images)}보다 큽니다.")
 
         # 이미지 인덱싱
         img_file = self.images[idx]
@@ -188,6 +296,7 @@ class PillDataset(Dataset):
             if self.transform:
                 img, bboxes_tensor = self.transform(img, bboxes_tensor)
 
+            # COCODateset 기준 + 알약 이름 추가
             targets = {
                 'boxes': bboxes_tensor,
                 'labels': labels_tensor,
@@ -206,7 +315,9 @@ class PillDataset(Dataset):
         else:
             if self.transform:
                 img = self.transform(img)
-                
+
+########################################################################################################
+# test.py때에 수정이 필요해 보임
             # 이미지, _ for in batch
             return img, img_file
 
@@ -215,6 +326,25 @@ class PillDataset(Dataset):
         return len(self.images)
 
     def get_img_info(self, idx):
+        """
+        get_img_info 함수
+
+        특정 인덱스에 해당하는 이미지의 파일명 및 크기 정보를 반환합니다.
+
+        Args:
+            idx (int): 가져올 이미지의 인덱스  
+
+        Returns:
+            dict:  
+                - file_name (str): 이미지 파일 이름  
+                - height (int): 이미지 세로 크기  
+                - width (int): 이미지 가로 크기  
+
+        Note:
+            어노테이션 파일을 로드하여 이미지 메타데이터 정보를 가져옵니다.  
+            사용 예시: info = dataset.get_img_info(0)
+                       print(info)
+        """
         ann_file = self.annots[idx]
         ann_path = os.path.join(self.ann_dir, ann_file)
         try:
@@ -226,6 +356,22 @@ class PillDataset(Dataset):
         return {"file_name": ann['images'][0]['file_name'], "height": ann['images'][0]['height'], "width": ann['images'][0]['width']}
 
     def get_ann_info(self, idx):
+        """
+        get_ann_info 함수
+
+        특정 인덱스에 해당하는 어노테이션 JSON 파일의 내용을 반환합니다.
+
+        Args:
+            idx (int): 가져올 어노테이션 인덱스  
+
+        Returns:
+            dict: 해당 어노테이션 JSON의 전체 내용 (파싱된 JSON)  
+
+        Note:
+            어노테이션 파일이 잘못되었거나 JSON 디코딩 실패 시 None 반환  
+            사용예시: ann = dataset.get_ann_info(0)
+                      print(json.dumps(ann, indent=2, ensure_ascii=False))
+        """
         ann_file = self.annots[idx]
         ann_path = os.path.join(self.ann_dir, ann_file)
         try:
@@ -237,7 +383,7 @@ class PillDataset(Dataset):
         
 
 ####################################################################################################
-# 데이터 로더 함수
+# 4. 데이터 로더 함수
 def get_loader(img_dir, ann_dir, batch_size=16, mode="train", val_ratio=0.2, debug=False, seed=42):
     """
     데이터 로더를 반환하는 함수
@@ -253,21 +399,49 @@ def get_loader(img_dir, ann_dir, batch_size=16, mode="train", val_ratio=0.2, deb
 
     Returns:
         torch.utils.data.DataLoader: 해당 모드의 데이터 로더
-    """    
+    """
+    # 디버깅 메시지 출력
+    if not isinstance(img_dir, str):
+        raise TypeError(f"img_dir는 문자열(str)이어야 합니다. 현재 타입: {type(img_dir)}")
+    if ann_dir is not None and not isinstance(ann_dir, str):
+        raise TypeError(f"ann_dir는 문자열(str)이거나 None이어야 합니다. 현재 타입: {type(ann_dir)}")
+    if not isinstance(batch_size, int) or batch_size <= 0:
+        raise ValueError(f"batch_size는 양의 정수여야 합니다. 현재 입력: {batch_size}")
+    if mode not in ['train', 'val', 'test']:
+        raise ValueError(f"mode는 'train', 'val', 'test' 중 하나여야 합니다. 현재 입력: {mode}")
+    if not (0 < val_ratio < 1):
+        raise ValueError(f"val_ratio는 0과 1 사이의 실수여야 합니다. 현재 입력: {val_ratio}")
+    if not isinstance(debug, bool):
+        raise TypeError(f"debug는 bool 타입이어야 합니다. 현재 타입: {type(debug)}")
+    
     # 트랜스폼
     transforms = get_transforms(mode=mode)
 
     # 카테고리 매핑 (train/val에서만 필요)
     if mode in ['train', 'val']:
         name_to_idx, idx_to_name = get_category_mapping(ann_dir=ann_dir)
+        # 매핑 보여주기
+        if debug:
+            print("\n[DEBUG] 카테고리 매핑 정보:")
+            print(f"- 총 클래스 수: {len(name_to_idx)}")
+            print(f"- No Class 인덱스: {name_to_idx['No Class']}")
+            # name_to_idx 딕셔너리
+            print(f"- 매핑 테이블 (name_to_idx):\n{json.dumps(name_to_idx, indent=2, ensure_ascii=False)}")
+            # idx_to_name 딕셔너리
+            print("\n[DEBUG] idx_to_name 매핑 (정렬 출력):")
+            max_idx_len = len(str(max(idx_to_name.keys())))  # 인덱스 최대 길이 구하기
+            for idx in sorted(idx_to_name.keys()):
+                print(f"  {idx:>{max_idx_len}}: {idx_to_name[idx]}")
+
     else:
         name_to_idx, idx_to_name = None, None
-    # print(name_to_idx)
-    # print('')
-    # print(idx_to_name)
 
     # 데이터셋
     dataset = PillDataset(image_dir=img_dir, ann_dir=ann_dir, mode=mode, category_mapping=name_to_idx, transform=transforms, debug=debug)
+
+    # [DEBUG 추가]
+    if debug and mode in ['train', 'val']:
+        print(f"\n[DEBUG] 전체 데이터셋 크기: {len(dataset)}개")
 
     # collator 정의
     def collator(batch):
@@ -283,6 +457,11 @@ def get_loader(img_dir, ann_dir, batch_size=16, mode="train", val_ratio=0.2, deb
         train_size = int((1 - val_ratio) * len(dataset))
         train_dataset, val_dataset = random_split(dataset, [train_size, len(dataset) - train_size], generator=generator)
 
+        # [DEBUG 추가]
+        if debug:
+            print(f"[DEBUG] 랜덤시드 고정: {seed}")
+            print(f"[DEBUG] Train/Val Split: Train = {train_size}, Val = {len(dataset) - train_size}")
+
         loader = DataLoader(
             train_dataset if mode == 'train' else val_dataset,
             batch_size=batch_size,
@@ -292,25 +471,28 @@ def get_loader(img_dir, ann_dir, batch_size=16, mode="train", val_ratio=0.2, deb
         )
 
         if debug:
-            print(f"\n{mode}_loader의 데이터 크기: {len(loader)}")
+            print(f"\n[DEBUG] {mode} loader 배치 수: {len(loader)}")
             for batch in loader:
                 if batch is not None:
                     images, targets = batch
-                    print(f"Batch size: {len(images)}")
+                    print(f"[DEBUG] Batch size: {len(images)}")
+                    print(f"[DEBUG] 첫 이미지 크기: {images[0].shape}")
 
-                    # 첫 번째 샘플의 image 정보 출력
-                    print(f"\n[첫 번째 샘플 이미지 정보]")
-                    print(f" - Image size: {images[0].shape}")
-
-                    # 첫 번째 샘플의 target 정보 출력
                     sample_target = targets[0]
-                    print(f"[첫 번째 샘플 타겟 정보]")
-                    print(f" - image_id: {sample_target['image_id'].item()}")
-                    print(f" - boxes shape: {sample_target['boxes'].shape}")
-                    print(f" - labels: {sample_target['labels'].tolist()}")
-                    print(f" - areas: {sample_target['area'].tolist()}")
-                    print(f" - orig_size: {sample_target['orig_size'].tolist()}")
-                    print(f" - pill_names: {sample_target['pill_names']}")                                    
+                    boxes = sample_target['boxes']
+                    areas = sample_target['area']
+                    print(f"[DEBUG] 첫 샘플 image_id: {sample_target['image_id'].item()}")
+                    print(f"[DEBUG] 박스 개수: {boxes.shape[0]}")
+                    print(f"[DEBUG] 박스 크기 (W,H) 최대/최소: {boxes[:, 2:].max().item()}, {boxes[:, 2:].min().item()}")
+                    print("[DEBUG] 라벨별 출현 횟수:")
+                    label_counts = torch.bincount(sample_target['labels'])
+                    for idx, count in enumerate(label_counts):
+                        if count > 0:
+                            label_name = name_to_idx and idx_to_name.get(idx, "Unknown")
+                            print(f"  - {idx}: {label_name} → {count}회")
+                        
+                    print(f"[DEBUG] 이미지 텐서 메모리: {images[0].element_size() * images[0].nelement() / 1024 ** 2:.2f}MB")
+                    print(f"[DEBUG] Pill names (샘플): {sample_target['pill_names']}")                                 
                 break
 
         return loader
@@ -323,16 +505,13 @@ def get_loader(img_dir, ann_dir, batch_size=16, mode="train", val_ratio=0.2, deb
 
         # 배치 사이즈 예시
         if debug:
-            print(f"\n{mode}_loader의 데이터 크기: {len(test_loader)}")
+            print(f"\n[DEBUG] 테스트 데이터셋 배치 수: {len(test_loader)}") 
             for batch in test_loader:
                 if batch is not None:
-                    # (img, img_file)
                     images, img_name = batch
-                    print(f"Batch size: {len(images)}")
-
-                    # # 첫 번째 샘플의 image 정보 출력
-                    print(f"Image shape: {images[0].shape}")
-                    print(f"File  name : {img_name[0]}")
+                    print(f"[DEBUG] Batch size: {len(images)}")
+                    print(f"[DEBUG] 첫 이미지 shape: {images[0].shape}")
+                    print(f"[DEBUG] 배치 이미지 파일명 목록: {img_name}")
                 break  
 
         return test_loader
@@ -341,13 +520,25 @@ def get_loader(img_dir, ann_dir, batch_size=16, mode="train", val_ratio=0.2, deb
         raise ValueError(f"Invalid mode: {mode}. Choose either 'train', 'val', or 'test'.")
 
 ####################################################################################################
-# 메인 시작    
+# 5. 메인 시작    
 if __name__ == "__main__":
     # argparse 시작
     parser = argparse.ArgumentParser(description="PillDataset DataLoader Debug Runner")
     parser.add_argument('--mode', type=str, default='train', choices=['train', 'val', 'test'], help="운영 모드")
     parser.add_argument('--batch_size', type=int, default=4, help="배치 크기")
     parser.add_argument('--debug', action='store_true', help="디버깅 모드 여부")
+    
+######################################################################################
+# 추가인자에 맞춰서 수정하기
+    # # ✅ 추가 인자 (아래 추가)
+    # parser.add_argument('--val_ratio', type=float, default=0.2, help="검증 데이터셋 비율 (0 ~ 1)")  # ⭐ 추가됨
+    # parser.add_argument('--seed', type=int, default=42, help="랜덤 시드 (재현성 보장)")  # ⭐ 추가됨
+    # parser.add_argument('--resize', type=int, default=None, help="이미지 리사이즈 크기 (정사각형)")  # ⭐ 추가됨
+    # parser.add_argument('--num_workers', type=int, default=4, help="DataLoader 병렬 처리 쓰레드 수")  # ⭐ 추가됨
+    # parser.add_argument('--max_samples', type=int, default=None, help="데이터셋 일부만 사용 (디버깅용)")  # ⭐ 추가됨
+    # parser.add_argument('--verbose_level', type=int, default=1, help="디버그 출력 단계 (0=없음, 1=기본, 2=상세)")  # ⭐ 추가됨
+    # parser.add_argument('--output_dir', type=str, default='logs/', help="디버깅/매핑 저장 디렉토리")  # ⭐ 추가됨
+    # parser.add_argument('--save_mapping', action='store_true', help="카테고리 매핑 테이블을 JSON 파일로 저장")  # ⭐ 추가됨
     args = parser.parse_args()
     # 변경 사항 끝
 
