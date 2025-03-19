@@ -1,8 +1,46 @@
-#################
-# 실행방법?
-# python src/data_loader.py --mode train --batch_size 4 --debug
-# 
-# 카테고리 매핑, 리사이즈(나중에), 데이터셋 리턴값
+########################################
+# 실행 방법 및 인자 설명 (터미널 기준)
+#
+# 사용법:
+#   python src/data_loader.py --mode <모드> --batch_size <배치 크기> [--debug]
+#
+# 파싱 인자 설명:
+# --mode (필수)  
+#   - 선택 가능 값: 'train', 'val', 'test'  
+#   - train  : 학습용 데이터셋 로드 및 디버깅 실행  
+#   - val    : 검증용 데이터셋 로드 및 디버깅 실행  
+#   - test   : 테스트용 데이터셋 로드 (어노테이션 없이 이미지와 파일명 반환)  
+#
+# --batch_size (선택, default=4)  
+#   - DataLoader에서 사용하는 배치 크기  
+#   - ex) --batch_size 8 → 8개 샘플 단위로 배치 로딩  
+#
+# --debug (옵션)  
+#   - 해당 플래그 추가 시 디버깅 모드 활성화  
+#   - 데이터셋 및 배치 관련 상세 정보를 출력  
+#   - 출력 예: 카테고리 매핑 정보, 총 데이터 수, Split 비율,  
+#              각 배치별 이미지 크기, 박스 정보, 라벨 등장 분포 등  
+#
+# 실행 예시 (터미널):
+# 1) 학습 데이터셋 로더 테스트
+#   python src/data_loader.py --mode train --batch_size 4 --debug
+#
+# 2) 검증 데이터셋 로더 테스트
+#   python src/data_loader.py --mode val --batch_size 8 --debug
+#
+# 3) 테스트 데이터셋 로더 테스트
+#   python src/data_loader.py --mode test --batch_size 16 --debug
+#
+# 프로젝트 폴더 예시:
+# data/
+# ├─ train_images/           (훈련 이미지)
+# ├─ train_annots_modify/    (훈련 어노테이션 JSON)
+# └─ test_images/            (테스트 이미지)
+#
+# ⚠ 디버깅 모드를 활성화하면, 매핑 테이블, 데이터 수,  
+#    각 배치별 샘플 크기, 바운딩 박스 통계, 라벨별 출현 횟수,  
+#    pill_names 목록 등을 모두 확인 가능합니다!
+########################################
 
 import os
 import json
@@ -15,7 +53,7 @@ import argparse
 import sys
 
 ####################################################################################################
-# 데이터 증강을 위한 transform 정의
+# 1. 데이터 증강을 위한 transform 정의
 def get_transforms(mode='train'):
     """
     데이터 증강 및 전처리 함수를 반환합니다.
@@ -46,7 +84,7 @@ def get_transforms(mode='train'):
         raise ValueError(f"Invalid mode: {mode}. Choose either 'train', 'val', or 'test'.")
 
 ####################################################################################################
-# json파일에서 카테고리 매핑을 만드는 함수
+# 2. json파일에서 카테고리 매핑을 만드는 함수
 def get_category_mapping(ann_dir):
     """
     어노테이션 디렉토리 내 JSON 파일들을 탐색하여  
@@ -100,7 +138,7 @@ def get_category_mapping(ann_dir):
     return name_to_idx, idx_to_name
 
 ####################################################################################################
-# 데이터셋
+# 3. 데이터셋
 class PillDataset(Dataset):
     def __init__(self, image_dir, ann_dir=None, mode='train', category_mapping=None, transform=None, debug=False):
         """
@@ -345,7 +383,7 @@ class PillDataset(Dataset):
         
 
 ####################################################################################################
-# 데이터 로더 함수
+# 4. 데이터 로더 함수
 def get_loader(img_dir, ann_dir, batch_size=16, mode="train", val_ratio=0.2, debug=False, seed=42):
     """
     데이터 로더를 반환하는 함수
@@ -387,6 +425,9 @@ def get_loader(img_dir, ann_dir, batch_size=16, mode="train", val_ratio=0.2, deb
             print("\n[DEBUG] 카테고리 매핑 정보:")
             print(f"- 총 클래스 수: {len(name_to_idx)}")
             print(f"- No Class 인덱스: {name_to_idx['No Class']}")
+            # name_to_idx 딕셔너리
+            print(f"- 매핑 테이블 (name_to_idx):\n{json.dumps(name_to_idx, indent=2, ensure_ascii=False)}")
+            # idx_to_name 딕셔너리
             print("\n[DEBUG] idx_to_name 매핑 (정렬 출력):")
             max_idx_len = len(str(max(idx_to_name.keys())))  # 인덱스 최대 길이 구하기
             for idx in sorted(idx_to_name.keys()):
@@ -479,7 +520,7 @@ def get_loader(img_dir, ann_dir, batch_size=16, mode="train", val_ratio=0.2, deb
         raise ValueError(f"Invalid mode: {mode}. Choose either 'train', 'val', or 'test'.")
 
 ####################################################################################################
-# 메인 시작    
+# 5. 메인 시작    
 if __name__ == "__main__":
     # argparse 시작
     parser = argparse.ArgumentParser(description="PillDataset DataLoader Debug Runner")
