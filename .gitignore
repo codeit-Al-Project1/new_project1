@@ -5,7 +5,7 @@ __pycache__
 # 해당 디랙토리를 제외시킴
 data/train_annots_modify/*
 
-# 이미지 디랙토리, push/ pull 방지 -- 업데이트를 희망한다면 .gitignore에서 제외 시키는 것을 고려
+이미지 디랙토리, push/ pull 방지 -- 업데이트를 희망한다면 .gitignore에서 제외 시키는 것을 고려
 data/test_images/*
 data/train_images/*
 data/train_annotations/*
