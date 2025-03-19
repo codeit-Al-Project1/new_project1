@@ -109,10 +109,13 @@ class PillDataset(Dataset):
 
 
     def __len__(self):
-        return len(self.ann_files)
+        if self.mode in ['train', 'val']:
+            return len(self.annots)  # ✅ self.annots 사용 (수정)
+        else:
+            return len(self.images)  # ✅ 테스트 모드에서는 이미지 개수 기준
 
     def get_img_info(self, idx):
-        ann_file = self.ann_files[idx]
+        ann_file = self.annots[idx]
         ann_path = os.path.join(self.ann_dir, ann_file)
         try:
             with open(ann_path, 'r', encoding='utf-8') as f:
@@ -123,7 +126,7 @@ class PillDataset(Dataset):
         return {"file_name": ann['images'][0]['file_name'], "height": ann['images'][0]['height'], "width": ann['images'][0]['width']}
 
     def get_ann_info(self, idx):
-        ann_file = self.ann_files[idx]
+        ann_file = self.annots[idx]
         ann_path = os.path.join(self.ann_dir, ann_file)
         try:
             with open(ann_path, 'r', encoding='utf-8') as f:
@@ -133,8 +136,8 @@ class PillDataset(Dataset):
             return None
 
 
-TRAIN_ROOT = "data/train_images"
-TRAIN_ANN_DIR = "data/train_annots_modify"
+TRAIN_ROOT = "data/train/train_images"
+TRAIN_ANN_DIR = "data/train/train_annotations"
 TEST_ROOT = "data/test_images"
 
 def get_loader(img_dir, ann_dir, batch_size=16, mode="train", val_ratio=0.2, debug=False, seed=42):
@@ -195,3 +198,19 @@ def get_loader(img_dir, ann_dir, batch_size=16, mode="train", val_ratio=0.2, deb
 # test_loader = get_test_loader(batch_size)
 
 if __name__ == "__main__":
+    # 기본 설정
+    img_dir = TRAIN_ROOT  # 훈련용 이미지 경로
+    ann_dir = TRAIN_ANN_DIR  # 훈련용 어노테이션 경로
+    
+    batch_size = 4  # 작은 배치 크기로 테스트
+    mode = "train"
+    
+    # 데이터 로더 생성
+    train_loader, val_loader = get_loader(img_dir, ann_dir, batch_size=batch_size, mode=mode, debug=True)
+
+    # 데이터 로딩 테스트 (한 번만 실행)
+    for images, targets in train_loader:
+        print(f"첫 번째 배치 - 이미지 개수: {len(images)}")
+        print(f"첫 번째 배치 - 첫 번째 이미지 크기: {images[0].shape}")
+        print(f"첫 번째 배치 - 타겟 개수: {len(targets)}")
+        break  # 한 번만 실행 후 종료
