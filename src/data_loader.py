@@ -278,7 +278,7 @@ def get_loader(img_dir, ann_dir, batch_size=16, mode="train", val_ratio=0.2, deb
     if mode == 'train' or mode == 'val':
         # 훈련/ 검증 분리하기
         train_size = int((1 - val_ratio) * len(dataset))
-        train_dataset, val_dataset = random_split(dataset, [train_size, len(dataset) - train_size])
+        train_dataset, val_dataset = random_split(dataset, [train_size, len(dataset) - train_size], generator=generator)
 
         loader = DataLoader(
             train_dataset if mode == 'train' else val_dataset,
