@@ -108,8 +108,8 @@ def folder_check():
     annot_folder = "train_annotations"
 
     annot_path = os.path.join(path, annot_folder)
-    
-    inside_list = []
+
+    count = 0
 
     # 모든 파일을 먼저 수집하고 그 후 tqdm으로 진행 표시
     all_files = []
@@ -118,17 +118,20 @@ def folder_check():
             if file.endswith('.json'):
                 all_files.append(os.path.join(root, file))
 
-    for json_file_path in tqdm(all_files, desc="Processing files", unit="file"):
-        # JSON 파일 로드
-        with open(json_file_path, 'r') as f:
-            data = json.load(f)
-            inside_list.append(data)
+    # 파일이 존재하면 tqdm으로 진행 상태 표시
+    if all_files:
+        for json in tqdm(all_files, desc="Counting JSON files", unit="file", mininterval=0.5, maxinterval=2):
+            count += 1
+        print(f"{count}개가 폴더 내부에 있습니다.")
+    else:
+        print("폴더 내부에 파일이 없습니다.")
 
-    print(f"{len(inside_list)}개가 폴더 내부에 있습니다.")
+    return
     
 
 if __name__ == '__main__':
-    download_data(download=True, extract=True)
+    # 다운로드 파일이 있으면 False로 조정
+    download_data(download=False, extract=False)
     folder_check()
     wrap_annotation()
     folder_check()
