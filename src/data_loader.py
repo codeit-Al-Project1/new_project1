@@ -19,9 +19,9 @@ def get_transforms(mode='train'):
     if mode == 'train':
         return T.Compose([
             T.ToImage(), # PIL → TVImage 자동 변환
-            T.RandomHorizontalFlip(),
-            T.RandomVerticalFlip(),
-            T.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1, hue=0.1),
+            T.RandomHorizontalFlip(),   # 수평 뒤집기
+            T.RandomVerticalFlip(),     # 수직 뒤집기
+            T.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1, hue=0.1),   # 밝기 조절
             T.ToDtype(torch.float32, scale=True)  # 0 ~ 1 스케일링
         ])
     elif mode == "val" or mode == "test":
