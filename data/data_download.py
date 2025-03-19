@@ -127,10 +127,9 @@ def folder_check():
         
     return
 
-    
 
 if __name__ == '__main__':
-    download_data(download=True, extract=True)
+    download_data(download=False, extract=False)
     folder_check()
     wrap_annotation()
     folder_check()
