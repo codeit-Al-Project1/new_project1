@@ -130,7 +130,7 @@ def folder_check():
     
 
 if __name__ == '__main__':
-    download_data(download=False, extract=False)
+    download_data(download=True, extract=True)
     folder_check()
     wrap_annotation()
     folder_check()
