@@ -5,7 +5,7 @@ from torchvision.transforms import functional as F
 from PIL import Image
 
 # 테스트 이미지 시각화
-def visualize_predictions(model, image_path, device, threshold=0.5):
+def predict(model, image_path, device, threshold=0.5):
     # 이미지 로드 및 전처리
     image = Image.open(image_path).convert("RGB")
     image_tensor = F.to_tensor(image).unsqueeze(0).to(device)

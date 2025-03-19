@@ -22,7 +22,8 @@ def main():
     parser.add_argument("--batch_size", type=int, default=5, help="배치사이즈")
     parser.add_argument("--num_classes", type=int, default=74, help="클래스 개수")
     parser.add_argument("--epochs", type=int, default=5, help="학습할 에폭 수")
-    parser.add_argument("--lr", type=float, default=0.005, help="학습률")
+    parser.add_argument("--lr", type=float, default=0.001, help="학습률")
+    parser.add_argument("--weight_decay", type=float, default=0.0005, help="L2 정규화")
 
     # predict
     parser.add_argument("--model_path", type=str, default="models/fast_rcnn.pth", help="저장된 모델 경로")
@@ -32,7 +33,7 @@ def main():
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     if args.mode == "train":
-        train(args.json_path, args.img_dir,args.batch_size, args.num_classes, args.epochs, args.lr, device)
+        train(args.json_path, args.img_dir,args.batch_size, args.num_classes, args.epochs, args.lr, args.weight_decay, device) 
     elif args.mode == "predict":
         if not args.image_path:
             print("predict 모드에서는 --image_path를 지정해야 합니다.")
