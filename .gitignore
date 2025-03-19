@@ -1,1 +1,12 @@
 data/
+src/__init__.py
+src/data_loader.py
+src/datasetYOLO.py
+src/json_modify.py
+src/train_YOLO.py
+src/train.py
+src/model.py
+src/predict.py
+src/utils.py
+models/
+requirements.txt

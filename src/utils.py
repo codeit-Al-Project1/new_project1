@@ -1,10 +1,11 @@
+######## 넌 바뀌면 안된다잉
+
 import torch.optim as optim
 import torch.optim.lr_scheduler as lr_scheduler
 
 def get_optimizer(name, model, lr=1e-3, weight_decay=0, momentum=0.9):
     """
     주어진 이름(name)에 해당하는 옵티마이저를 생성하여 반환합니다.
-
     :param name: 사용할 옵티마이저 이름 (예: 'adam', 'sgd', 'adamw', 'rmsprop')
     :param model: 학습할 모델의 파라미터
     :param lr: 학습률
