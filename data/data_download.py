@@ -5,7 +5,6 @@ import gdown
 import shutil
 from tqdm import tqdm
 import json
-import requests
 
 def download_data(download_path = './data', download=True, extract=True):
     """
@@ -108,7 +107,7 @@ def folder_check():
     annot_folder = "train_annotations"
 
     annot_path = os.path.join(path, annot_folder)
-
+    
     count = 0
 
     # 모든 파일을 먼저 수집하고 그 후 tqdm으로 진행 표시
@@ -125,12 +124,11 @@ def folder_check():
         print(f"{count}개가 폴더 내부에 있습니다.")
     else:
         print("폴더 내부에 파일이 없습니다.")
-
+        
     return
-    
+
 
 if __name__ == '__main__':
-    # 다운로드 파일이 있으면 False로 조정
     download_data(download=False, extract=False)
     folder_check()
     wrap_annotation()
