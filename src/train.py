@@ -1,97 +1,92 @@
 import torch
 import torch.optim as optim
+import torch.nn as nn
 from tqdm import tqdm
-import os
-import sys
-from torch.optim.lr_scheduler import ReduceLROnPlateau
-from .data_loader import get_train_val_loader
-from .model import get_model, save_model
-from src.utils import evaluate_mAP
+from src.dataset import get_dataloader
+from src.model import get_fast_rcnn_model
+from src.model import save_model
+from src.dataset import split_dataloader
 
-# 설정
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-epochs = 20
-learning_rate = 0.005
-weight_decay = 1e-4
-num_classes = 74  # 카테고리 개수 + 배경
-batch_size = 4 # ** 추가 **
+"""
+**Fast R-CNN에서 SGD를 쓰는 이유**
 
-# 데이터 로드
-train_loader, val_loader = get_train_val_loader(batch_size, val_ratio = 0.2, debug = False ) # 데이터 디렉토리 추가하기
+일반화 성능이 더 좋음 (과적합 방지)
+메모리 효율적 (대규모 데이터에 적합)
+Momentum을 추가하면 안정적 (빠른 수렴)
+즉, Fast R-CNN에서는 빠르게 최적화하는 것보다, 일반화가 잘 되면서도 안정적인 학습이 더 중요하므로 SGD를 선택
+"""
+def train(json_dir, img_dir, batch_size=5, num_classes=74, num_epochs=5, lr=0.001, device="cuda"):
+    # 학습용 데이터 로더, 분할
+    dataloader = get_dataloader(json_dir, img_dir, batch_size)
+    train_loader, val_loader = split_dataloader(dataloader, val_split=0.2)
 
-# 모델 로드
-model = get_model(num_classes).to(device)
+    # 모델 정의
+    model = get_fast_rcnn_model(num_classes).to(device)
+    # 옵티마이저 정의
+    optimizer = optim.SGD(model.parameters(), lr=lr, momentum=0.9, weight_decay=0.0005)
+    # 검증 손실 초기화
+    best_val_loss = float("inf")
 
-# 옵티마이저
-optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9, weight_decay=weight_decay) # SGD or AdamW
+    for epoch in range(num_epochs):
+        model.train()
+        total_loss = 0
+        epoch_loss_details = {}
 
-# 스케쥴러
-scheduler = ReduceLROnPlateau(optimizer, mode='min', patience=3, factor=0.5, verbose=True)
-
-# 학습 함수
-def train(model, train_loader, optimizer, epoch):
-    model.train()
-    running_loss = 0.0
-    loop = tqdm(train_loader, leave=False, desc=f"Epoch {epoch+1}/{epochs}")
-
-    for images, targets in loop:
-        images = [img.to(device) for img in images]
-        targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
-
-        optimizer.zero_grad()
-        loss_dict = model(images, targets)
-        loss = sum(loss for loss in loss_dict.values())
-        loss.backward()
-        optimizer.step()
-
-        running_loss += loss.item()
-        loop.set_postfix(loss=loss.item())
-
-    return running_loss / len(train_loader)
-
-# 검증 함수
-def validate(model, val_loader):
-    model.eval()
-    val_loss = 0.0
-    all_preds = []
-    all_targets = []
-
-    with torch.no_grad():
-        loop = tqdm(val_loader, leave=False, desc="Validating")
-
-        for images, targets in loop: # DataLoader에서 가져옴
+        # 1. 학습 단계
+        for images, targets in tqdm(train_loader, total=len(train_loader), desc="Processing training"):
             images = [img.to(device) for img in images]
             targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
 
+            # 모델 학습
             loss_dict = model(images, targets)
-            loss = sum(loss for loss in loss_dict.values())
-            val_loss += loss.item()
+            losses = sum(loss for loss in loss_dict.values())
 
-            # mAP 평가를 위한 예측 저장
-            outputs = model(images)
-            all_preds.extend(outputs)
-            all_targets.extend(targets)
+            optimizer.zero_grad()
+            losses.backward()
 
-    mAP = evaluate_mAP(all_preds, all_targets)
-    return val_loss / len(val_loader), mAP
+            # Gradient Clipping 추가
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+            optimizer.step()
 
-# 학습 루프
-best_mAP = 0.0
-os.makedirs("checkpoints", exist_ok=True)
+            total_loss += losses.item()
 
-for epoch in range(epochs):
-    print(f"\n🔹 Epoch {epoch+1}/{epochs} 시작")
+            # 개별 손실 요소 누적
+            for k, v in loss_dict.items():
+                if k not in epoch_loss_details:
+                    epoch_loss_details[k] = 0
+                epoch_loss_details[k] += v.item()
 
-    train_loss = train(model, train_loader, optimizer, epoch)
-    val_loss, mAP = validate(model, val_loader)
+        avg_loss_details = ", ".join([f"{k}: {v / len(train_loader):.4f}" for k, v in epoch_loss_details.items()])
+        print(f"Epoch {epoch+1} Complete - Total Loss: {total_loss:.4f}, Avg Loss Per Component: {avg_loss_details}")
 
-    print(f"📉 Train Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f}, mAP: {mAP:.4f}")
+        # 2. 검증 단계
+        model.eval()
+        val_loss = 0
+        val_loss_details = {}
 
-    scheduler.step(val_loss)
+        with torch.no_grad():
+            for images, targets in tqdm(enumerate(val_loader), total=len(val_loader), desc="Processing validation"):
+                images = [img.to(device) for img in images]
+                targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
 
-    if mAP > best_mAP:
-        best_mAP = mAP
-        save_model(model)
-        print("✅ Best model saved!")
+                loss_dict = model(images, targets)
+                losses = sum(loss for loss in loss_dict.values())
 
-print("Training Complete!")
+                val_loss += losses.item()
+
+                for k, v in loss_dict.items():
+                    if k not in val_loss_details:
+                        val_loss_details[k] = 0
+                    val_loss_details[k] += v.item()
+
+        avg_val_loss_details = ", ".join([f"{k}: {v / len(val_loader):.4f}" for k, v in val_loss_details.items()])
+        print(f"Validation Loss for Epoch {epoch+1} - Total Loss: {val_loss:.4f}, Avg Loss Per Component: {avg_val_loss_details}")
+
+        # 검증 손실이 개선되었으면 모델 저장
+        if val_loss < best_val_loss:
+            best_val_loss = val_loss
+            print(f"Validation Loss decreased to {best_val_loss:.4f}. Saving model...")
+            save_model(model, save_dir="../models", base_name="best_trained_model", ext=".pth")
+
+if __name__ == "__main__":
+    train(json_dir="data/mapped_annotations.json", img_dir="data/train_images")
