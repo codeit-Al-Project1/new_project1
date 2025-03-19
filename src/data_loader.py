@@ -257,8 +257,11 @@ def get_loader(img_dir, ann_dir, batch_size=16, mode="train", val_ratio=0.2, deb
     # 트랜스폼
     transforms = get_transforms(mode=mode)
 
-    # 카테고리 매핑
-    name_to_idx, idx_to_name = get_category_mapping(ann_dir=ann_dir)
+    # 카테고리 매핑 (train/val에서만 필요)
+    if mode in ['train', 'val']:
+        name_to_idx, idx_to_name = get_category_mapping(ann_dir=ann_dir)
+    else:
+        name_to_idx, idx_to_name = None, None
     # print(name_to_idx)
     # print('')
     # print(idx_to_name)
