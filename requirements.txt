@@ -1,6 +1,16 @@
 kaggle
-torch
-torchvision
+torch==2.6.0+cu124          # 팀원들 간 가장 많이 사용한 cu124 버전으로 통일 추천
+torchvision==0.21.0+cu124
+torchaudio==2.6.0+cu124
+torchinfo==1.8.0            # (torchinfo 대신 torchsummary 쓰는 사람도 있음, 둘 중 하나만 선택)
 opencv-python
+pillow==11.1.0
+scikit-learn
+scipy
 numpy
+pandas
+joblib
+tqdm
+threadpoolctl
 matplotlib
+gdown
